@@ -1,0 +1,52 @@
+name: Aanbiedingen checken
+
+on:
+  schedule:
+    # elke ochtend: 07:41 in de zomer, 06:41 in de winter (GitHub rekent in UTC)
+    - cron: "41 5 * * *"
+  # knop "Run workflow" op het Actions-tabblad
+  workflow_dispatch:
+  # meteen checken als je je lijstje aanpast
+  push:
+    paths:
+      - watchlist.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aanbiedingen-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Benodigdheden installeren
+        run: pip install requests beautifulsoup4
+
+      - name: Folderz bekijken en mailen
+        run: python checker.py
+        env:
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+
+      - name: Resultaten opslaan
+        run: |
+          git config user.name "aanbiedingwekker"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add resultaten.json gezien.json
+          if git diff --cached --quiet; then
+            echo "Niets veranderd."
+          else
+            git commit -m "Resultaten bijgewerkt"
+            git pull --rebase
+            git push
+          fi

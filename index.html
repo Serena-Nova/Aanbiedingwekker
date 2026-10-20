@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aanbiedingwekker</title>
+<meta name="theme-color" content="#E9F0EB">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9F0EB; --vel:#FFFFFF; --inkt:#1D2A26; --zacht:#5D6B66; --lijn:#D3DED7;
+  --groen:#2E5E4E; --groen-licht:#DCEBE2; --geel:#F5C431; --geel-donker:#5A4300;
+  --rood:#A8432F; --rood-licht:#F7E3DD;
+  --r-groot:18px; --r-klein:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141B18; --vel:#1D2622; --inkt:#E7EEEA; --zacht:#9DADA6; --lijn:#2E3A35;
+    --groen:#8CC9B0; --groen-licht:#23362E; --geel:#F5C431; --geel-donker:#3A2B00;
+    --rood:#F0A08C; --rood-licht:#3A2520;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141B18; --vel:#1D2622; --inkt:#E7EEEA; --zacht:#9DADA6; --lijn:#2E3A35;
+  --groen:#8CC9B0; --groen-licht:#23362E; --geel:#F5C431; --geel-donker:#3A2B00;
+  --rood:#F0A08C; --rood-licht:#3A2520;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--inkt);font:16px/1.5 "Atkinson Hyperlegible",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.kolom{max-width:600px;margin:0 auto;padding:22px 16px 120px}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;margin:0;line-height:1.15}
+h1{font-size:30px;font-weight:700;letter-spacing:-.01em}
+h2{font-size:20px;font-weight:700}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--geel);outline-offset:2px;border-radius:6px}
+
+.kop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}
+.kop p{margin:4px 0 0;color:var(--zacht);font-size:14px}
+.icoonknop{border:1px solid var(--lijn);background:var(--vel);border-radius:999px;width:42px;height:42px;display:grid;place-items:center;flex:none}
+.icoonknop svg{width:20px;height:20px}
+
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--vel);border:1px solid var(--lijn);border-radius:999px;padding:4px;margin-bottom:18px}
+.tabs button{border:0;background:none;border-radius:999px;padding:9px 8px;font-weight:700;font-size:15px;white-space:nowrap;color:var(--zacht)}
+.tabs button[aria-selected="true"]{background:var(--groen);color:var(--vel)}
+.tel{display:inline-block;min-width:22px;padding:0 6px;border-radius:999px;background:var(--geel);color:#2B2100;font-size:13px;margin-left:4px}
+
+/* lijstje */
+.lijst{list-style:none;margin:0;padding:0;background:var(--vel);border:1px solid var(--lijn);border-radius:var(--r-groot);overflow:hidden}
+.lijst li{display:flex;align-items:center;gap:12px;padding:14px 14px 14px 16px;border-top:1px solid var(--lijn)}
+.lijst li:first-child{border-top:0}
+.lijst .info{flex:1;min-width:0;text-align:left;background:none;border:0;padding:0}
+.lijst .naam{font-weight:700;display:block}
+.lijst .uit .naam{color:var(--zacht)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.chip{font-size:12.5px;padding:1px 8px;border-radius:999px;background:var(--groen-licht);color:var(--groen)}
+.chip.prijs{background:none;border:1px dashed var(--lijn);color:var(--zacht)}
+.chip.treffer{background:var(--geel);color:#2B2100}
+
+/* schakelaar */
+.schakel{position:relative;width:48px;height:28px;flex:none}
+.schakel input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.schakel span{position:absolute;inset:0;pointer-events:none;border-radius:999px;background:var(--lijn);transition:background .15s}
+.schakel span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.schakel input:checked + span{background:var(--groen)}
+.schakel input:checked + span::after{transform:translateX(20px)}
+.schakel input:focus-visible + span{outline:3px solid var(--geel);outline-offset:2px}
+.schakel-uitleg{font-size:12px;color:var(--zacht);text-align:right;margin:-4px 2px 8px}
+
+.knop{border:0;border-radius:999px;padding:11px 18px;font-weight:700;background:var(--groen);color:var(--vel)}
+.knop.licht{background:var(--vel);color:var(--groen);border:1px solid var(--lijn)}
+.knop.gevaar{background:none;color:var(--rood);padding-left:4px;padding-right:4px}
+.toevoegen{width:100%;margin-top:12px;border:1.5px dashed var(--groen);background:none;color:var(--groen);border-radius:var(--r-groot);padding:14px;font-weight:700}
+
+.leeg{background:var(--vel);border:1px solid var(--lijn);border-radius:var(--r-groot);padding:22px 18px;color:var(--zacht)}
+.leeg strong{color:var(--inkt);display:block;margin-bottom:4px}
+
+/* gevonden: het prijsstickertje is het opvallende element */
+.groep{margin-bottom:22px}
+.groep h3{font-size:17px;margin:0 2px 8px}
+.deal{position:relative;display:flex;gap:14px;align-items:center;background:var(--vel);border:1px solid var(--lijn);border-radius:var(--r-groot);padding:14px;margin-bottom:8px;text-decoration:none;color:inherit}
+.deal .tekst{flex:1;min-width:0}
+.deal .winkel{font-size:13px;color:var(--groen);font-weight:700}
+.deal .titel{display:block;margin:1px 0 4px}
+.deal .meta{font-size:13px;color:var(--zacht)}
+.deal .actie{display:inline-block;background:var(--rood-licht);color:var(--rood);border-radius:6px;padding:0 6px;font-weight:700;font-size:12.5px;margin-right:6px}
+.sticker{flex:none;width:84px;height:84px;border-radius:50%;background:var(--geel);color:#2B2100;display:grid;place-content:center;text-align:center;transform:rotate(-8deg);font-family:"Bricolage Grotesque",sans-serif;box-shadow:inset 0 0 0 3px rgba(255,255,255,.55)}
+.sticker .nu{font-size:22px;font-weight:700;line-height:1}
+.sticker .was{font-size:12px;text-decoration:line-through;opacity:.7;margin-top:3px}
+.sticker.zonder{font-size:14px;font-weight:700}
+.nieuw{position:absolute;top:-8px;left:14px;background:var(--groen);color:var(--vel);font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px}
+.stil{font-size:12px;color:var(--zacht)}
+.melding-uit{font-size:12.5px;color:var(--zacht);margin:-2px 2px 8px}
+
+.waarschuwing{background:var(--rood-licht);color:var(--rood);border-radius:var(--r-klein);padding:10px 14px;font-size:14px;margin-bottom:16px}
+
+/* opslaanbalk */
+.balk{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 30%)}
+.balk .binnen{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:12px;background:var(--inkt);color:var(--bg);border-radius:var(--r-groot);padding:10px 10px 10px 16px}
+.balk .binnen span{flex:1;font-size:14px}
+.balk .knop{background:var(--geel);color:#2B2100}
+.balk .knop.licht{background:none;color:var(--bg);border:0;text-decoration:underline;padding:11px 6px}
+
+/* venster */
+dialog{border:0;border-radius:22px;padding:0;width:min(560px,calc(100% - 24px));background:var(--vel);color:var(--inkt)}
+dialog::backdrop{background:rgba(15,25,21,.45)}
+.venster{padding:20px 18px 18px}
+.venster h2{margin-bottom:14px}
+label.veld{display:block;margin-bottom:14px;font-weight:700;font-size:14px}
+.veld input[type=text],.veld input[type=number],.veld input[type=password],.veld input[type=url]{display:block;width:100%;margin-top:5px;padding:11px 12px;border:1px solid var(--lijn);border-radius:var(--r-klein);background:var(--bg);font-weight:400;font-size:16px}
+.hint{display:block;font-weight:400;color:var(--zacht);font-size:13px;margin-top:4px}
+fieldset{border:0;padding:0;margin:0 0 14px}
+legend{font-weight:700;font-size:14px;padding:0;margin-bottom:6px}
+.keuzes{display:flex;flex-wrap:wrap;gap:6px}
+.keuzes label{position:relative}
+.keuzes input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.keuzes span{display:inline-block;padding:7px 13px;border-radius:999px;border:1px solid var(--lijn);font-size:14px}
+.keuzes input:checked + span{background:var(--groen);border-color:var(--groen);color:var(--vel)}
+.keuzes input:focus-visible + span{outline:3px solid var(--geel);outline-offset:2px}
+.rij{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.rij b{font-size:14px}
+.acties{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px}
+.acties div{display:flex;gap:8px}
+.winkelrij{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--lijn);font-size:15px}
+.winkelrij small{color:var(--zacht)}
+.melding{position:fixed;left:50%;top:16px;transform:translateX(-50%);background:var(--inkt);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="kolom">
+  <header class="kop">
+    <div>
+      <h1>Aanbiedingwekker</h1>
+      <p id="status">Laden…</p>
+    </div>
+    <button class="icoonknop" id="openInstellingen" aria-label="Instellingen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tabLijst" aria-selected="true" aria-controls="paneelLijst">Mijn lijstje</button>
+    <button role="tab" id="tabDeals" aria-selected="false" aria-controls="paneelDeals">In de aanbieding<span class="tel" id="aantalDeals" hidden></span></button>
+  </div>
+
+  <section id="paneelLijst" role="tabpanel" aria-labelledby="tabLijst">
+    <p class="schakel-uitleg" id="schakelUitleg" hidden>Schakelaar = e-mail bij aanbieding</p>
+    <ul class="lijst" id="lijst"></ul>
+    <div class="leeg" id="lijstLeeg" hidden>
+      <strong>Je lijstje is nog leeg</strong>
+      Voeg een product toe en kies bij welke winkels je het wilt volgen.
+    </div>
+    <button class="toevoegen" id="nieuwProduct">+ Product toevoegen</button>
+  </section>
+
+  <section id="paneelDeals" role="tabpanel" aria-labelledby="tabDeals" hidden>
+    <div id="fouten"></div>
+    <div id="deals"></div>
+  </section>
+</div>
+
+<div class="balk" id="balk" hidden>
+  <div class="binnen">
+    <span id="balkTekst">Je lijstje is aangepast</span>
+    <button class="knop licht" id="ongedaan">Terugzetten</button>
+    <button class="knop" id="opslaan">Opslaan</button>
+  </div>
+</div>
+
+<!-- product bewerken -->
+<dialog id="productVenster" aria-labelledby="productTitel">
+  <form class="venster" id="productForm" method="dialog">
+    <h2 id="productTitel">Product toevoegen</h2>
+    <label class="veld">Naam
+      <input type="text" name="naam" required autocomplete="off" placeholder="Bijv. Nivea dagcrème">
+    </label>
+    <label class="veld">Zoekwoorden
+      <input type="text" name="zoekwoorden" autocomplete="off" placeholder="Leeg = de naam">
+      <span class="hint">Alle woorden moeten in de aanbieding staan. Meerdere varianten? Scheid ze met een komma, bijv. <i>andrelon shampoo, dove shampoo</i></span>
+    </label>
+    <fieldset>
+      <legend>Bij welke winkels?</legend>
+      <div class="keuzes" id="winkelKeuzes"></div>
+    </fieldset>
+    <label class="veld">Maximumprijs (optioneel)
+      <input type="number" name="maxPrijs" min="0" step="0.01" inputmode="decimal" placeholder="Bijv. 4,50">
+      <span class="hint">Alleen melden als de aanbieding niet duurder is dan dit.</span>
+    </label>
+    <div class="rij">
+      <b>E-mail als het in de aanbieding is</b>
+      <label class="schakel"><input type="checkbox" name="melding" aria-label="E-mail als het in de aanbieding is"><span></span></label>
+    </div>
+    <div class="acties">
+      <button type="button" class="knop gevaar" id="verwijder">Verwijderen</button>
+      <div>
+        <button type="button" class="knop licht" data-sluit>Annuleren</button>
+        <button type="submit" class="knop" value="ok">Klaar</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<!-- instellingen -->
+<dialog id="instVenster" aria-labelledby="instTitel">
+  <form class="venster" id="instForm" method="dialog">
+    <h2 id="instTitel">Instellingen</h2>
+    <label class="veld">GitHub-gebruikersnaam
+      <input type="text" name="eigenaar" autocomplete="off" autocapitalize="off" placeholder="SerenaNova">
+    </label>
+    <label class="veld">Naam van de repository
+      <input type="text" name="repo" autocomplete="off" autocapitalize="off" placeholder="aanbiedingwekker">
+    </label>
+    <label class="veld">Toegangssleutel (token)
+      <input type="password" name="token" autocomplete="off" placeholder="github_pat_…">
+      <span class="hint">Nodig om je lijstje op te slaan. Wordt alleen in deze browser bewaard.</span>
+    </label>
+
+    <h2 style="font-size:17px;margin:20px 0 6px">Winkels</h2>
+    <div id="winkelLijst"></div>
+    <label class="veld" style="margin-top:12px">Winkel toevoegen
+      <input type="url" name="nieuweWinkel" placeholder="Plak de Folderz-link van de winkel">
+      <span class="hint">Bijv. https://www.folderz.nl/winkels/zeeman/folders-aanbiedingen</span>
+    </label>
+    <button type="button" class="knop licht" id="winkelToevoegen">Winkel toevoegen</button>
+
+    <div class="acties" style="margin-top:20px">
+      <span></span>
+      <div>
+        <button type="button" class="knop licht" data-sluit>Annuleren</button>
+        <button type="submit" class="knop" value="ok">Bewaren</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<div class="melding" id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const opslag = {
+    lees(k){ try { return localStorage.getItem(k); } catch { return null; } },
+    zet(k,v){ try { localStorage.setItem(k,v); } catch {} }
+  };
+
+  // ── instellingen: eigenaar/repo raden uit het GitHub Pages-adres ──
+  function raadRepo(){
+    const h = location.hostname, p = location.pathname.split('/').filter(Boolean);
+    if (h.endsWith('.github.io')) return { eigenaar: h.replace('.github.io',''), repo: p[0] || '' };
+    return { eigenaar:'', repo:'' };
+  }
+  const geraden = raadRepo();
+  const inst = {
+    eigenaar: opslag.lees('aw.eigenaar') || geraden.eigenaar,
+    repo: opslag.lees('aw.repo') || geraden.repo,
+    token: opslag.lees('aw.token') || ''
+  };
+
+  let lijst = { winkels: [], producten: [] };   // wat er nu getoond wordt
+  let opgeslagen = '';                          // laatst opgeslagen versie (json)
+  let sha = null;                               // versie van watchlist.json op GitHub
+  let resultaten = null;
+  let bewerkId = null;
+
+  // ── GitHub ──
+  const api = pad => `https://api.github.com/repos/${inst.eigenaar}/${inst.repo}/contents/${pad}`;
+  const kopjes = () => {
+    const k = { Accept: 'application/vnd.github+json' };
+    if (inst.token) k.Authorization = `Bearer ${inst.token}`;
+    return k;
+  };
+  const b64naarTekst = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g,'')), c => c.charCodeAt(0)));
+  const tekstNaarB64 = t => { let s=''; new TextEncoder().encode(t).forEach(b => s += String.fromCharCode(b)); return btoa(s); };
+
+  async function leesBestand(pad){
+    if (inst.eigenaar && inst.repo) {
+      try {
+        const r = await fetch(api(pad) + `?t=${Date.now()}`, { headers: kopjes(), cache: 'no-store' });
+        if (r.ok) { const j = await r.json(); return { data: JSON.parse(b64naarTekst(j.content)), sha: j.sha }; }
+        if (r.status === 404) return { data: null, sha: null };
+      } catch {}
+    }
+    // terugval: het bestand naast deze pagina (werkt op GitHub Pages en lokaal)
+    try {
+      const r = await fetch(`${pad}?t=${Date.now()}`, { cache: 'no-store' });
+      if (r.ok) return { data: await r.json(), sha: null };
+    } catch {}
+    return { data: null, sha: null };
+  }
+
+  async function opslaan(){
+    if (!inst.token || !inst.eigenaar || !inst.repo) {
+      toast('Vul eerst je GitHub-gegevens in om op te slaan');
+      openInstellingen(); return;
+    }
+    const knop = $('#opslaan'); knop.disabled = true; knop.textContent = 'Opslaan…';
+    try {
+      if (!sha) { const huidig = await fetch(api('watchlist.json'), { headers: kopjes() }); if (huidig.ok) sha = (await huidig.json()).sha; }
+      const body = { message: 'Lijstje bijgewerkt', content: tekstNaarB64(JSON.stringify(lijst, null, 2) + '\n') };
+      if (sha) body.sha = sha;
+      const r = await fetch(api('watchlist.json'), { method:'PUT', headers: { ...kopjes(), 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+      if (!r.ok) {
+        const fout = await r.json().catch(() => ({}));
+        if (r.status === 401) throw new Error('De toegangssleutel klopt niet of is verlopen. Maak een nieuwe aan in GitHub.');
+        if (r.status === 403 || r.status === 404) throw new Error('Geen schrijfrechten op deze repository. Geef de sleutel toegang tot "Contents: Read and write".');
+        if (r.status === 409) throw new Error('Het lijstje is ondertussen ergens anders aangepast. Ververs de pagina en probeer het opnieuw.');
+        throw new Error(fout.message || `GitHub gaf fout ${r.status}`);
+      }
+      sha = (await r.json()).content.sha;
+      opgeslagen = JSON.stringify(lijst);
+      toonBalk();
+      toast('Opgeslagen. Je lijstje wordt nu gecontroleerd; binnen een paar minuten zie je het resultaat.');
+      setTimeout(laadResultaten, 120000);
+    } catch (e) {
+      toast(e.message || 'Opslaan lukte niet');
+    } finally {
+      knop.disabled = false; knop.textContent = 'Opslaan';
+    }
+  }
+
+  // ── tekenen ──
+  const winkelNaam = slug => (lijst.winkels.find(w => w.slug === slug) || {}).naam || slug;
+  const euro = x => x == null ? '' : '€ ' + Number(x).toFixed(2).replace('.', ',');
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function treffersVoor(id){ return (resultaten?.gevonden || []).filter(g => g.product_id === id).length; }
+
+  function tekenLijst(){
+    const ul = $('#lijst'); ul.innerHTML = '';
+    const p = lijst.producten;
+    $('#lijstLeeg').hidden = p.length > 0;
+    ul.hidden = p.length === 0;
+    $('#schakelUitleg').hidden = p.length === 0;
+    p.forEach(prod => {
+      const li = document.createElement('li');
+      if (!prod.melding) li.className = 'uit';
+      const n = treffersVoor(prod.id);
+      li.innerHTML = `
+        <button class="info" type="button">
+          <span class="naam">${esc(prod.naam)}</span>
+          <span class="chips">
+            ${(prod.winkels || []).map(w => `<span class="chip">${esc(winkelNaam(w))}</span>`).join('') || '<span class="chip prijs">nog geen winkel gekozen</span>'}
+            ${prod.maxPrijs != null && prod.maxPrijs !== '' ? `<span class="chip prijs">max ${esc(euro(prod.maxPrijs))}</span>` : ''}
+            ${n ? `<span class="chip treffer">${n}× in de aanbieding</span>` : ''}
+          </span>
+        </button>
+        <label class="schakel"><input type="checkbox" ${prod.melding ? 'checked' : ''} aria-label="E-mail voor ${esc(prod.naam)}"><span></span></label>`;
+      li.querySelector('.info').onclick = () => openProduct(prod.id);
+      li.querySelector('input').onchange = e => { prod.melding = e.target.checked; tekenLijst(); toonBalk(); };
+      ul.appendChild(li);
+    });
+  }
+
+  function tekenDeals(){
+    const doel = $('#deals'), fouten = $('#fouten');
+    const g = resultaten?.gevonden || [];
+    $('#aantalDeals').hidden = !g.length; $('#aantalDeals').textContent = g.length;
+    const kapot = Object.values(resultaten?.winkels || {}).filter(w => !w.ok);
+    fouten.innerHTML = kapot.length
+      ? `<div class="waarschuwing">Niet gelukt bij de laatste controle: ${kapot.map(w => esc(w.naam)).join(', ')}. Daar kan ik nu dus niets over zeggen.</div>` : '';
+    if (!resultaten) { doel.innerHTML = `<div class="leeg"><strong>Nog geen controle gedaan</strong>Na de eerste controle zie je hier wat er van je lijstje in de aanbieding is.</div>`; return; }
+    if (!g.length) { doel.innerHTML = `<div class="leeg"><strong>Op dit moment niets in de aanbieding</strong>Er wordt elke ochtend opnieuw gekeken.</div>`; return; }
+    const groepen = {};
+    g.forEach(x => (groepen[x.product_naam] ||= []).push(x));
+    doel.innerHTML = Object.entries(groepen).map(([naam, items]) => `
+      <div class="groep">
+        <h3>${esc(naam)}</h3>
+        ${items[0].melding ? '' : '<p class="melding-uit">Melding staat uit voor dit product.</p>'}
+        ${items.map(x => `
+          <a class="deal" href="${esc(x.url)}" target="_blank" rel="noopener">
+            ${x.nieuw ? '<span class="nieuw">Nieuw</span>' : ''}
+            <span class="tekst">
+              <span class="winkel">${esc(x.winkel_naam)}</span>
+              <span class="titel">${esc(x.titel)}</span>
+              <span class="meta">${x.actie ? `<span class="actie">${esc(x.actie)}</span>` : ''}${esc(x.geldig)}</span>
+            </span>
+            ${x.prijs != null
+              ? `<span class="sticker"><span class="nu">${esc(euro(x.prijs))}</span>${x.oud ? `<span class="was">${esc(euro(x.oud))}</span>` : ''}</span>`
+              : `<span class="sticker zonder">actie</span>`}
+          </a>`).join('')}
+      </div>`).join('');
+  }
+
+  function tekenStatus(){
+    let t = 'Nog niet gecontroleerd';
+    if (resultaten?.bijgewerkt) {
+      const d = new Date(resultaten.bijgewerkt), nu = new Date();
+      const tijd = d.toLocaleTimeString('nl-NL', { hour:'2-digit', minute:'2-digit' });
+      const zelfdeDag = d.toDateString() === nu.toDateString();
+      t = `Laatst gecontroleerd: ${zelfdeDag ? 'vandaag' : d.toLocaleDateString('nl-NL', { weekday:'long', day:'numeric', month:'long' })} om ${tijd}`;
+    }
+    $('#status').textContent = t;
+  }
+
+  function toonBalk(){
+    const gewijzigd = JSON.stringify(lijst) !== opgeslagen;
+    $('#balk').hidden = !gewijzigd;
+  }
+
+  let toastTimer;
+  function toast(t){
+    const el = $('#toast'); el.textContent = t; el.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true, 4500);
+  }
+
+  // ── product venster ──
+  function openProduct(id){
+    bewerkId = id;
+    const p = lijst.producten.find(x => x.id === id) || { naam:'', zoekwoorden:'', winkels:[], melding:true, maxPrijs:null };
+    const f = $('#productForm');
+    $('#productTitel').textContent = id ? 'Product aanpassen' : 'Product toevoegen';
+    f.naam.value = p.naam; f.zoekwoorden.value = p.zoekwoorden || '';
+    f.maxPrijs.value = p.maxPrijs ?? ''; f.melding.checked = !!p.melding;
+    $('#verwijder').hidden = !id;
+    $('#winkelKeuzes').innerHTML = lijst.winkels.map(w => `
+      <label><input type="checkbox" value="${esc(w.slug)}" ${p.winkels.includes(w.slug) ? 'checked' : ''}><span>${esc(w.naam)}</span></label>`).join('')
+      || '<span class="hint">Voeg eerst een winkel toe bij Instellingen.</span>';
+    $('#productVenster').showModal();
+    if (!id) f.naam.focus();
+  }
+
+  $('#productForm').addEventListener('submit', e => {
+    const f = e.target;
+    const naam = f.naam.value.trim();
+    if (!naam) { e.preventDefault(); return; }
+    const winkels = [...document.querySelectorAll('#winkelKeuzes input:checked')].map(i => i.value);
+    const maxRuw = f.maxPrijs.value.trim().replace(',', '.');
+    const data = {
+      naam,
+      zoekwoorden: f.zoekwoorden.value.trim(),
+      winkels,
+      melding: f.melding.checked,
+      maxPrijs: maxRuw === '' ? null : Number(maxRuw)
+    };
+    if (bewerkId) Object.assign(lijst.producten.find(x => x.id === bewerkId), data);
+    else lijst.producten.push({ id: 'p' + Date.now().toString(36), ...data });
+    tekenLijst(); toonBalk();
+  });
+  $('#verwijder').onclick = () => {
+    const p = lijst.producten.find(x => x.id === bewerkId);
+    if (p && confirm(`"${p.naam}" van je lijstje halen?`)) {
+      lijst.producten = lijst.producten.filter(x => x.id !== bewerkId);
+      $('#productVenster').close(); tekenLijst(); toonBalk();
+    }
+  };
+  $('#nieuwProduct').onclick = () => openProduct(null);
+
+  // ── instellingen venster ──
+  function tekenWinkels(){
+    $('#winkelLijst').innerHTML = lijst.winkels.map(w => {
+      const gebruikt = lijst.producten.some(p => (p.winkels || []).includes(w.slug));
+      return `<div class="winkelrij"><span>${esc(w.naam)} <small>${esc(w.slug)}</small></span>
+        ${gebruikt ? '<small>in gebruik</small>' : `<button type="button" class="knop gevaar" data-weg="${esc(w.slug)}">Weghalen</button>`}</div>`;
+    }).join('');
+    $('#winkelLijst').querySelectorAll('[data-weg]').forEach(b => b.onclick = () => {
+      lijst.winkels = lijst.winkels.filter(w => w.slug !== b.dataset.weg); tekenWinkels(); toonBalk();
+    });
+  }
+  function openInstellingen(){
+    const f = $('#instForm');
+    f.eigenaar.value = inst.eigenaar; f.repo.value = inst.repo; f.token.value = inst.token; f.nieuweWinkel.value = '';
+    tekenWinkels();
+    $('#instVenster').showModal();
+  }
+  $('#openInstellingen').onclick = openInstellingen;
+  $('#winkelToevoegen').onclick = () => {
+    const veld = $('#instForm').nieuweWinkel;
+    const m = veld.value.match(/folderz\.nl\/winkels\/([a-z0-9-]+)/i) || veld.value.trim().match(/^([a-z0-9-]+)$/i);
+    if (!m) { toast('Plak een link zoals folderz.nl/winkels/zeeman/…'); return; }
+    const slug = m[1].toLowerCase();
+    if (lijst.winkels.some(w => w.slug === slug)) { toast('Die winkel staat er al'); return; }
+    const naam = prompt('Hoe heet deze winkel?', slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()));
+    if (!naam) return;
+    lijst.winkels.push({ slug, naam: naam.trim() });
+    veld.value = ''; tekenWinkels(); toonBalk(); tekenLijst();
+  };
+  $('#instForm').addEventListener('submit', e => {
+    const f = e.target;
+    inst.eigenaar = f.eigenaar.value.trim(); inst.repo = f.repo.value.trim(); inst.token = f.token.value.trim();
+    opslag.zet('aw.eigenaar', inst.eigenaar); opslag.zet('aw.repo', inst.repo); opslag.zet('aw.token', inst.token);
+    laadAlles();
+  });
+  document.querySelectorAll('[data-sluit]').forEach(b => b.onclick = () => b.closest('dialog').close());
+
+  // ── tabs ──
+  function kiesTab(welke){
+    const lijstTab = welke === 'lijst';
+    $('#tabLijst').setAttribute('aria-selected', lijstTab); $('#tabDeals').setAttribute('aria-selected', !lijstTab);
+    $('#paneelLijst').hidden = !lijstTab; $('#paneelDeals').hidden = lijstTab;
+  }
+  $('#tabLijst').onclick = () => kiesTab('lijst');
+  $('#tabDeals').onclick = () => kiesTab('deals');
+
+  $('#opslaan').onclick = opslaan;
+  $('#ongedaan').onclick = () => { lijst = JSON.parse(opgeslagen); tekenLijst(); toonBalk(); };
+  window.addEventListener('beforeunload', e => { if (!$('#balk').hidden) { e.preventDefault(); e.returnValue = ''; } });
+
+  // ── laden ──
+  async function laadResultaten(){
+    const r = await leesBestand('resultaten.json');
+    resultaten = r.data;
+    tekenStatus(); tekenDeals(); tekenLijst();
+  }
+  async function laadAlles(){
+    const w = await leesBestand('watchlist.json');
+    if (w.data) { lijst = w.data; sha = w.sha; }
+    lijst.winkels ||= []; lijst.producten ||= [];
+    opgeslagen = JSON.stringify(lijst);
+    toonBalk();
+    await laadResultaten();
+    if (resultaten?.gevonden?.some(g => g.nieuw)) kiesTab('deals');
+  }
+  laadAlles();
+})();
+</script>
+</body>
+</html>

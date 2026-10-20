@@ -1,0 +1,18 @@
+{
+  "winkels": [
+    { "slug": "hema", "naam": "HEMA" },
+    { "slug": "etos", "naam": "Etos" },
+    { "slug": "kruidvat", "naam": "Kruidvat" },
+    { "slug": "jumbo", "naam": "Jumbo" }
+  ],
+  "producten": [
+    {
+      "id": "voorbeeld1",
+      "naam": "Nivea (voorbeeld)",
+      "zoekwoorden": "nivea",
+      "winkels": ["etos", "kruidvat"],
+      "melding": false,
+      "maxPrijs": null
+    }
+  ]
+}
