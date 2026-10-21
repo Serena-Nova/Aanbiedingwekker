@@ -1,0 +1,18 @@
+{
+  "bijgewerkt": "2026-10-21T12:35+02:00",
+  "winkels": {
+    "etos": {
+      "naam": "Etos",
+      "ok": false,
+      "aantal": 0,
+      "fout": "Geen aanbiedingen gevonden op de pagina (misschien is Folderz veranderd)."
+    },
+    "kruidvat": {
+      "naam": "Kruidvat",
+      "ok": false,
+      "aantal": 0,
+      "fout": "Geen aanbiedingen gevonden op de pagina (misschien is Folderz veranderd)."
+    }
+  },
+  "gevonden": []
+}
